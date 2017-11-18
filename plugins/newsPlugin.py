@@ -5,6 +5,7 @@ import chardet
 import pymongo
 from xml.etree import ElementTree
 from lxml import etree
+import threading
 
 __all__ = ["newsPlugin"]
 
@@ -27,21 +28,23 @@ class newsPlugin(Plugin):
         html = html.decode(chardet.detect(html)['encoding'])
         return html
 
-    def getUrls(self,url,listXpath,titleXpath,postDataXpath,source,contextXpath):
-        content = self.downloade(url)
-        page = etree.HTML(content)
-        hrefs = page.xpath(listXpath)
-        for href in hrefs:
-            self.dealContent(href,titleXpath,postDataXpath,source,contextXpath)
+    def dealOneSite(self,url,listXpath,titleXpath,postDataXpath,source,contextXpath):
+        listContext = self.downloade(url)
+        listPage = etree.HTML(listContext)
+        hrefs = listPage.xpath(listXpath)
+        postDatas = listPage.xpath(postDataXpath)
 
-    def dealContent(self,contentUrl,titleXpath,postDataXpath,source,contextXpath):
+        for (href,postData) in zip(hrefs,postDatas):
+            self.dealContent(href, titleXpath, postData, source, contextXpath)
+
+
+    def dealContent(self,contentUrl,titleXpath,postData,source,contextXpath):
+
+        print("download:   ",contentUrl)
+
         context = self.downloade(contentUrl)
-
-        print(context)
-
         page = etree.HTML(context)
         title = page.xpath(titleXpath)
-        postData = page.xpath(postDataXpath)
         source = source
         contextClean = page.xpath(contextXpath)
 
@@ -53,16 +56,26 @@ class newsPlugin(Plugin):
     def getResult(self):
         root = ElementTree.parse("/home/hadoop/pworkspace/pluginSpider/newsConf.xml")
         nodes = root.getiterator("node")
-
+        threads = []
         for node in nodes:
-            url = node.find('url').text
-            listUrl = node.find('listUrl').text
-            title = node.find('title').text
-            postDate = node.find('postDate').text
-            soucrce = node.find('soucrce').text
-            contextXpath = node.find('content').text
-            self.getUrls(url,listUrl,title,postDate,soucrce,contextXpath)
+            try:
+                url = node.find('url').text
+                listXpath = node.find('listUrl').text
+                titleXpath = node.find('title').text
+                postDataXpath = node.find('postDate').text
+                source = node.find('source').text
+                contextXpath = node.find('content').text
 
+                t = threading.Thread(target=self.dealOneSite,args=(url,listXpath,titleXpath,postDataXpath,source,contextXpath))
+                threads.append(t)
+            except BaseException:
+                print(url + "  Error !!!")
+
+        for t in threads:
+            t.setDaemon(True)
+            t.start()
+
+        t.join()
 
 if __name__ == '__main__':
     obj = newsPlugin()
