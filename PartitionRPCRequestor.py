@@ -6,8 +6,8 @@ class PartitionRPCRequestor():
     def __init__(self,  queueName):
         self.queueName = queueName
 
-        self.credentials = pika.PlainCredentials('hadoop', '123qdcz$%^')
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters('218.77.58.180', 5672,
+        self.credentials = pika.PlainCredentials('hadoop', '123xxxx$%^')
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1', 5672,
                                                                             '/finance', self.credentials))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange='Language_Direct',

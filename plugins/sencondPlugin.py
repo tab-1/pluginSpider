@@ -23,7 +23,7 @@ class SecondPlugin(Plugin):
 
     def __init__(self):
         Plugin.__init__(self)
-        uri = 'mongodb://bjl:123456@127.0.0.1/Taxation?authMechanism=SCRAM-SHA-1'
+        uri = 'mongodb://tabkey:123456@127.0.0.1/Taxation?authMechanism=SCRAM-SHA-1'
         self.client = pymongo.MongoClient(uri)
 
         self.db = self.client['Taxation']
@@ -73,6 +73,9 @@ class SecondPlugin(Plugin):
         print('doc:  ',doc)
 
         self.collection.insert(doc)
+
+    def scan(self):
+        print("this is scan")
 
 if __name__ == '__main__':
     obj = SecondPlugin()

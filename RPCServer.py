@@ -20,8 +20,8 @@ class RPCService(IService):
         self.queueName = queueName
         self.procedure = procedure
 
-        credentials = pika.PlainCredentials('hadoop', '123qdcz$%^')
-        connection = pika.BlockingConnection(pika.ConnectionParameters('218.77.58.180', 5672, '/finance', credentials))
+        credentials = pika.PlainCredentials('hadoop', '123xxxx$%^')
+        connection = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1', 5672, '/finance', credentials))
 
         channel = connection.channel()
 
@@ -43,7 +43,7 @@ class RPCService(IService):
     def serve(self,procedure,data):
         return procedure.process(data)
 
-    def on_request(ch, method, props, body):
+    def on_request(self, ch, method, props, body):
         inputStr = str(body)
 
 

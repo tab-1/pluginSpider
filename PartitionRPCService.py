@@ -12,8 +12,8 @@ queueName = 'pythonServer'
 plugin_manager = DirectoryPluginManager()
 plugin_manager.loadPlugins()
 
-credentials = pika.PlainCredentials('bijl', '123456^')
-connection = pika.BlockingConnection(pika.ConnectionParameters('123456', 5672, '/finance', credentials))
+credentials = pika.PlainCredentials('tabkey', '123456^')
+connection = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1', 5672, '/finance', credentials))
 channel = connection.channel()
 channel.exchange_declare(exchange='Language_Direct',
                          exchange_type='direct')
